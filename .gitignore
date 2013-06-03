@@ -5,3 +5,4 @@ build/
 WebContent/
 !.gitignore
 *.jar
+!WebContent/WEB-INF/lib/*.jar

@@ -10,12 +10,10 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.TreeMap;
-   
+
 import org.htmlparser.Node;
 import org.htmlparser.NodeFilter;
 import org.htmlparser.Parser;
@@ -48,7 +46,6 @@ import com.gravitygroups.crawler.HtmlTag;
 import com.gravitygroups.crawler.WebCrawler;
 import com.gravitygroups.io.FileUtils;
 import com.gravitygroups.util.MapUtils;
-import com.gravitygroups.util.Output;
 
 /**
  * 在WebContent v1.0-release finised的版本後修正該版本錯誤的。
@@ -77,7 +74,7 @@ public class WebContentParser extends WebCrawler
 	public static BlockProperties parseWebContent( String url ) throws ParserException
 	{
 		NodeList visualBlockNodeList = getVisualBlock( url );
-		Output.printNodeList( visualBlockNodeList );
+//		Output.printNodeList( visualBlockNodeList );
 		NodeList linkNodeList = findLinkBlock( visualBlockNodeList );
 		NodeList invalidNodeList = findInvalidBlock( visualBlockNodeList );
 		NodeList actionNodeList = findActionBlock( visualBlockNodeList ); // NOTE: 因為動作標籤可能沒有包含文字，所以要獨立出來找
@@ -88,13 +85,13 @@ public class WebContentParser extends WebCrawler
 		blockNodeMap.put( INVALID_BLOCK, invalidNodeList );
 		blockNodeMap.put( ACTION_BLOCK, actionNodeList );
 		
-		/*
+		/* DEBUG:用來看VisualBlock是屬於哪種區塊屬性!!
 		for ( int i = 0; i < visualBlockNodeList.size(); i++ )
 		{
 			Node currentNode = visualBlockNodeList.elementAt( i );
 			String currentHtml = currentNode.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
 			String currentText = WebCrawler.filterSpecialSymbol( currentNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
-//			System.out.printf( "Tag=%s\nHtml=%s\nText=%s\n", currentNode.getClass().getSimpleName(), currentHtml, currentText );
+			System.out.printf( "Tag=%s\nHtml=%s\nText=%s\n", currentNode.getClass().getSimpleName(), currentHtml, currentText );
 			System.out.println( "*" + currentHtml + "\n" + currentText );
 			if ( linkNodeList.contains( currentNode ) )
 				System.out.println( "\t" + LINK_BLOCK );
@@ -106,7 +103,7 @@ public class WebContentParser extends WebCrawler
 				System.out.println( "\tOK!");
 			System.out.println("");
 		}
-		*/
+//		*/
 		
 		List<BlockProperties> blockPropertiesList = getBlockProperties( blockNodeMap );
 		Map<BlockProperties, Double> propMap = new TreeMap<BlockProperties, Double>();
@@ -159,13 +156,14 @@ public class WebContentParser extends WebCrawler
 			
 			// 由視覺區块的class或id來判斷，包含article和content的字眼可提高權重值
 			CompositeTag blockTag = (CompositeTag)blockProp.getBlockNode();
+		
 			String className = blockTag.getAttribute( "class" );
 			String idName = blockTag.getAttribute( "id" );
 			String checkName = null;
 			if ( idName != null )
-				checkName = idName;
+				checkName = idName.toLowerCase();
 			else if ( className != null )
-				checkName = className;
+				checkName = className.toLowerCase();
 			
 			if ( checkName != null )
 			{
@@ -183,7 +181,7 @@ public class WebContentParser extends WebCrawler
 									checkName.contains( "content" ) ) ||
 							checkName.contains( "innertext" ) ||
 							( checkName.contains( "content" ) &&
-									checkName.contains( "article" ) ) )
+									checkName.contains( "article" ) ) ) 
 						weight *= 1000.0;
 					else if ( checkName.contains( "content" ) )
 						weight *= 50.0;
@@ -191,6 +189,10 @@ public class WebContentParser extends WebCrawler
 						weight *= 10.0;
 					else if ( checkName.contains( "text" ) )
 						weight *= 5.0;
+					
+					// 有id的再加分
+					if ( idName != null )
+						weight *= 100.0;
 //					System.out.println( "Weight'=" + weight );
 
 				}
@@ -200,6 +202,14 @@ public class WebContentParser extends WebCrawler
 //			System.out.println( "\t*Weight=" + weight );
 			propMap = MapUtils.sortByValue( propMap, true );
 		}
+		
+		/* 查看Weight排名!!
+		for ( BlockProperties prop : propMap.keySet() )
+		{
+			prop.print();
+			System.out.println("\tWeight=" + propMap.get( prop ) );
+		}
+//		*/
 		
 		int count = 0; // 為了取得第一個BlockProperties用的
 		BlockProperties contentProp = null;
@@ -436,13 +446,33 @@ public class WebContentParser extends WebCrawler
 	public static void main( String[] args )
 	{
 		String u =
-				"http://www.319papago.idv.tw/SuperTaste/100-E.html";
+				// 正文在Action_Block
+//				"http://blog.roodo.com/irisworld/archives/15695503.html";
+				
+				"http://blog.yam.com/luckbear123/article/57356460";
+		
+//				"http://blog.yam.com/sequel/article/16960751";
 //				"http://taipeipackage.mysinablog.com/index.php?op=ViewArticle&articleId=3518752";
 //				"http://estherhsiao.pixnet.net/blog/post/36986003-%E5%8D%B3%E6%99%82%E7%BE%8E%E5%91%B3%E7%AD%86%E8%A8%98%E2%88%A3-20120806-%E9%A3%9F%E5%B0%9A%E7%8E%A9%E5%AE%B6-%E5%8F%B0%E5%8C%97%E6%9D%B1%E5%8D%80%E9%81%94";
 //				"http://www.u-style.com.tw/topic/view/8424";
 //		"http://evacyl52201.pixnet.net/blog/post/26660580-%E6%9D%B1%E5%8D%80%E6%BD%AE%E5%BA%97%E6%80%8E%E9%BA%BC%E9%80%9B%EF%BC%9F"
 		try
 		{
+			/* DUBUG用來看VisualBlock!
+			NodeList nodeList = getVisualBlock( u );
+			for ( int i = 0; i < nodeList.size(); i++ )
+			{
+				Node node = nodeList.elementAt( i );
+				String html = node.toHtml().replaceAll( "\\s+", " " ).trim();
+				String text = node.toPlainTextString().replaceAll( "\\s+", " " ).trim();
+				System.out.printf("%d. %s\n%s\n\n", i, html, text );
+			}
+//			*/
+//			findActionBlock( getVisualBlock( u ) );
+			BlockProperties contentProp = parseWebContent( u ); 
+			System.out.println( "\n正文: " ); contentProp.print();
+			
+			/*
 //			Output.printCollection( parseAddressList( u ), true );
 //			parseAddressList( u, "台北市" );
 //			checkBugURL();
@@ -474,6 +504,7 @@ public class WebContentParser extends WebCrawler
 				BlockProperties contentProp = parseWebContent( url ); 
 				System.out.println( "\n正文: " ); contentProp.print();
 			}
+			*/
 		}
 		catch ( Exception e )
 		{
@@ -557,10 +588,11 @@ public class WebContentParser extends WebCrawler
 	 */
 	public static NodeList getVisualBlock( String url ) throws ParserException
 	{
-		List<String> nodeTextList = new ArrayList<String>();
 		NodeList elementBlockNodeList = 
 			Parser.createParser( trimScript( url.trim() ), getEncode( url ) ).extractAllNodesThatMatch( new OrFilter( BLOCK_FILTER ) );
-		
+//			Parser.createParser( WebCrawler.getNodeList( url, new NodeClassFilter( Html.class ) ).toHtml(), getEncode( url ) ).extractAllNodesThatMatch( new NodeClassFilter( Div.class ) );
+
+//			Parser.createParser( WebCrawler.getNodeList( url ).toHtml(), getEncode( url ) ).extractAllNodesThatMatch( new AndFilter( new NodeClassFilter( Div.class ), new HasAttributeFilter( "class", "articleBody" ) ) );
 		NodeList visualBlockNodeList = new NodeList();
 		
 		if ( elementBlockNodeList.size() <= 0 )
@@ -578,22 +610,29 @@ public class WebContentParser extends WebCrawler
 
 			if ( nextText.length() <= 0  )
 				continue;
-//			System.out.printf( "**Tag=%s\nHtml=%s\nText=%s\n", nextNode.getClass().getSimpleName(), nextHtml, nextText );
-
-			else if ( nextText.equals( currentText ) && nextHtml.length() < currentHtml.length() )
+			
+//			System.out.printf( "%d.Tag=%s\nHtml=%s\nText=%s\n", i, nextNode.getClass().getSimpleName(), nextHtml, nextText );
+			if ( nextText.equals( currentText ) && nextHtml.length() < currentHtml.length() )
 			{
+//				System.out.printf( "%d.*Tag=%s\nHtml=%s\nText=%s\n\n", i, nextNode.getClass().getSimpleName(), nextHtml, nextText );
+//				System.out.println("\tDuplicate");
+//				visualBlockNodeList.add( nextNode );
 				currentNode = nextNode;
 				currentHtml = nextHtml;
 				currentText = nextText;
-				nodeTextList.add( currentText );
 			}
 			else if ( !nextText.equals( currentText ) )
 			{
-				visualBlockNodeList.add( currentNode );
-//				System.out.printf( "**Tag=%s\nHtml=%s\nText=%s\n", currentNode.getClass().getSimpleName(), currentHtml, currentText );
+//				System.out.printf( "%d.**Tag=%s\nHtml=%s\nText=%s\n\n", i, currentNode.getClass().getSimpleName(), currentHtml, currentText );
+//				System.out.println("\tUnique");
+				
 				currentNode = nextNode;
 				currentHtml = nextHtml;
 				currentText = nextText;
+				
+				if ( !visualBlockNodeList.contains( currentNode ) )
+					visualBlockNodeList.add( currentNode );
+//				visualBlockNodeList.add( currentNode );
 			}
 		}
 		return visualBlockNodeList;
@@ -1046,6 +1085,8 @@ public class WebContentParser extends WebCrawler
 					if ( childNodeName.equals( TextNode.class.getSimpleName() ) && childText.length() <= 0 )
 						continue;
 					
+//					System.out.printf("%s, %s\n", childNodeName, childText );
+					
 					// 找到第一層子結點是無效區塊
 					String actionNodeName = "";
 					if ( childNodeName.equals( InputTag.class.getSimpleName() ) )
@@ -1076,7 +1117,7 @@ public class WebContentParser extends WebCrawler
 					if ( actionNodeName.length() > 0 )
 					{
 						actionBlockNodeList.add( node );
-//						System.out.println( " -InvalidTag=" + invalidNodeName );
+//						System.out.println( " -InvalidTag=" + actionNodeName );
 					}
 //					printChildrenNode( childNode, 1 );
 					/*
@@ -1199,7 +1240,6 @@ public class WebContentParser extends WebCrawler
 		trimClassIDList.add( "box-text" );
 		trimClassIDList.add( "private-message" );
 		trimClassIDList.add( "user-info" );
-		trimClassIDList.add( "main" );
 		trimClassIDList.add( "container" );
 		trimClassIDList.add( "link" );
 		trimClassIDList.add( "extend" );
