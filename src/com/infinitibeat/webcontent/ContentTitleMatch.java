@@ -1,8 +1,8 @@
-package com.gravitygroups.webcontent;
+package com.infinitibeat.webcontent;
 
 import org.htmlparser.Node;
 
-import com.gravitygroups.crawler.WebCrawler;
+import com.infinitibeat.crawler.WebCrawler;
 
 /**
  * 用來儲存Match的相關資訊。

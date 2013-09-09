@@ -1,4 +1,4 @@
-package com.gravitygroups.servelt;
+package com.infinitibeat.servelt;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import javax.servlet.http.HttpSession;
 
 import org.htmlparser.util.ParserException;
 
-import com.gravitygroups.webcontent.WebContentParser;
+import com.infinitibeat.webcontent.WebContentParser;
 
 /**
  * Servlet implementation class ParseAddressServlet

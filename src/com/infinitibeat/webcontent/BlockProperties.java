@@ -2,7 +2,7 @@
  * Copyright (c) 2011 Eric Wei @ Gravity Groups Co.,Ltd.
  * All rights reserved.
  */
-package com.gravitygroups.webcontent;
+package com.infinitibeat.webcontent;
 
 import org.htmlparser.Node;
 

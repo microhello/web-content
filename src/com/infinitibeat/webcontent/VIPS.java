@@ -2,7 +2,7 @@
  * Copyright (c) 2011 Eric Wei @ Gravity Groups Co.,Ltd.
  * All rights reserved.
  */
-package com.gravitygroups.webcontent;
+package com.infinitibeat.webcontent;
 
 import java.io.UnsupportedEncodingException;
 
@@ -21,8 +21,8 @@ import org.htmlparser.tags.StyleTag;
 import org.htmlparser.util.NodeList;
 import org.htmlparser.util.ParserException;
 
-import com.gravitygroups.crawler.HtmlTag;
-import com.gravitygroups.crawler.WebCrawler;
+import com.infinitibeat.crawler.HtmlTag;
+import com.infinitibeat.crawler.WebCrawler;
 
 /**
  * 

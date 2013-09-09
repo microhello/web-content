@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="web-content" default="compile">
+	<property name="src.dir" location="src"/>
+	<property name="bin.dir" location="build/classes"/>
+	<property name="lib.dir" location="WebContent/WEB-INF/lib"/>
+	<property name="lib.jar" value="lib/commons-httpclient-3.0.1.jar lib/infinitibeat-engine-lib.jar lib/htmlparser.jar lib/log4j-1.2.16.jar"/>
+	<property name="jar.name" value="WebContentParser.jar"/>
+
+	<path id="classpath">
+		<fileset dir="${lib.dir}" includes="**/*.jar"/>
+	</path>
+
+	<target name="compile">
+		<mkdir dir="${bin.dir}"/>
+		<javac srcdir="${src.dir}/com/infinitibeat/webcontent" destdir="${bin.dir}" includeantruntime="false">
+			<classpath refid="classpath"/>
+		</javac>
+	</target>
+
+	<target name="make" depends="compile">
+		<jar destfile="${jar.name}"
+			basedir="${bin.dir}"
+			includes="com/infinitibeat/webcontent/**">
+			<manifest>
+				<attribute name="Main-Class" value="com.infinitibeat.webcontent.WebContentParser"/>
+				<attribute name="Class-Path" value="${lib.jar}"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<property name="styletrip_engine_lib.dir" value="../styletrip_engine/lib"/>
+	<target name="update_lib" depends="make">
+		<copy file="${jar.name}" todir="${styletrip_engine_lib.dir}" overwrite="true"/>
+	</target>
+</project>

@@ -2,7 +2,7 @@
  * Copyright (c) 2011 Eric Wei @ Gravity Groups Co.,Ltd.
  * All rights reserved.
  */
-package com.gravitygroups.webcontent;
+package com.infinitibeat.webcontent;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -42,10 +42,10 @@ import org.htmlparser.tags.TextareaTag;
 import org.htmlparser.util.NodeList;
 import org.htmlparser.util.ParserException;
 
-import com.gravitygroups.crawler.HtmlTag;
-import com.gravitygroups.crawler.WebCrawler;
-import com.gravitygroups.io.FileUtils;
-import com.gravitygroups.util.MapUtils;
+import com.infinitibeat.crawler.HtmlTag;
+import com.infinitibeat.crawler.WebCrawler;
+import com.infinitibeat.io.FileUtils;
+import com.infinitibeat.util.MapUtils;
 
 /**
  * 在WebContent v1.0-release finised的版本後修正該版本錯誤的。

@@ -1,11 +1,11 @@
-package com.gravitygroups.webcontent;
+package com.infinitibeat.webcontent;
 
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.gravitygroups.io.FileUtils;
+import com.infinitibeat.io.FileUtils;
 
 public class WebContentParserTest
 {
