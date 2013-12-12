@@ -6,6 +6,8 @@ package com.infinitibeat.webcontent;
 
 import org.htmlparser.Node;
 
+import com.infinitibeat.crawler.WebCrawler;
+
 /**
  * 表示一個網頁視覺區塊的相關資訊，例如：Html、文字、連結數...etc.
  * @author 白昌永, Eric Wei @ Gravity Groups Co.,Ltd.
@@ -15,7 +17,7 @@ public class BlockProperties implements Comparable<Object>
 {
 	private Node blockNode;
 	private String blockHtml;
-	private String blockText;
+//	private String blockText;
 
 	/**
 	 * 主要視覺區塊的屬性。
@@ -90,15 +92,7 @@ public class BlockProperties implements Comparable<Object>
 	 */
 	public String getBlockText()
 	{
-		return blockText;
-	}
-
-	/**
-	 * @param blockText the blockText to set
-	 */
-	public void setBlockText( String blockText )
-	{
-		this.blockText = blockText;
+		return WebCrawler.filterSpecialSymbol( WebCrawler.filterHTMLTag( this.getBlockHtml(), "" ) );
 	}
 
 	/**
@@ -263,7 +257,7 @@ public class BlockProperties implements Comparable<Object>
 
 	public void print()
 	{
-		System.out.printf( "*%s\n%s\n", this.blockHtml, this.blockText );
+		System.out.printf( "*%s\n%s\n", this.blockHtml, this.getBlockText() );
 		/*
 		System.out.print( this.propoperties );
 		System.out.printf( ", R=%f, All-Len=%d, Normal-Len=%f\n", this.blockTextRatio, 

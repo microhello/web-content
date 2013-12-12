@@ -46,6 +46,7 @@ import com.infinitibeat.crawler.HtmlTag;
 import com.infinitibeat.crawler.WebCrawler;
 import com.infinitibeat.io.FileUtils;
 import com.infinitibeat.util.MapUtils;
+import com.infinitibeat.util.Timer;
 
 /**
  * 在WebContent v1.0-release finised的版本後修正該版本錯誤的。
@@ -346,7 +347,7 @@ public class WebContentParser extends WebCrawler
 			contentHtml = contentHtml.replace( html, "" );
 		}
 		contentProp.setBlockHtml( contentHtml.replaceAll( HtmlTag.BR_REPLACE_REGEX, " " ).replaceAll( HtmlTag.STYLE_REPLACE_REGEX, "" ) );
-		contentProp.setBlockText( WebCrawler.filterSpecialSymbol( WebCrawler.filterHTMLTag( contentProp.getBlockHtml(), "" ) ) );
+//		contentProp.setBlockText( WebCrawler.filterSpecialSymbol( WebCrawler.filterHTMLTag( contentProp.getBlockHtml(), "" ) ) );
 
 //		contentProp.setBlockText( contentText );
 //		contentProp.print();
@@ -445,17 +446,16 @@ public class WebContentParser extends WebCrawler
 	 */
 	public static void main( String[] args )
 	{
-		String u =
+		String[] u =
 				// 正文在Action_Block
-//				"http://blog.roodo.com/irisworld/archives/15695503.html";
-				
-				"http://blog.yam.com/luckbear123/article/57356460";
-		
-//				"http://blog.yam.com/sequel/article/16960751";
-//				"http://taipeipackage.mysinablog.com/index.php?op=ViewArticle&articleId=3518752";
-//				"http://estherhsiao.pixnet.net/blog/post/36986003-%E5%8D%B3%E6%99%82%E7%BE%8E%E5%91%B3%E7%AD%86%E8%A8%98%E2%88%A3-20120806-%E9%A3%9F%E5%B0%9A%E7%8E%A9%E5%AE%B6-%E5%8F%B0%E5%8C%97%E6%9D%B1%E5%8D%80%E9%81%94";
-//				"http://www.u-style.com.tw/topic/view/8424";
-//		"http://evacyl52201.pixnet.net/blog/post/26660580-%E6%9D%B1%E5%8D%80%E6%BD%AE%E5%BA%97%E6%80%8E%E9%BA%BC%E9%80%9B%EF%BC%9F"
+			{
+				"http://blog.roodo.com/irisworld/archives/15695503.html", 
+				"http://blog.yam.com/luckbear123/article/57356460",
+				"http://blog.yam.com/sequel/article/16960751", 
+				"http://taipeipackage.mysinablog.com/index.php?op=ViewArticle&articleId=3518752", 
+				"http://estherhsiao.pixnet.net/blog/post/36986003-%E5%8D%B3%E6%99%82%E7%BE%8E%E5%91%B3%E7%AD%86%E8%A8%98%E2%88%A3-20120806-%E9%A3%9F%E5%B0%9A%E7%8E%A9%E5%AE%B6-%E5%8F%B0%E5%8C%97%E6%9D%B1%E5%8D%80%E9%81%94", 
+				"http://www.u-style.com.tw/topic/view/8424", 
+				"http://evacyl52201.pixnet.net/blog/post/26660580-%E6%9D%B1%E5%8D%80%E6%BD%AE%E5%BA%97%E6%80%8E%E9%BA%BC%E9%80%9B%EF%BC%9F"};
 		try
 		{
 			/* DUBUG用來看VisualBlock!
@@ -468,9 +468,15 @@ public class WebContentParser extends WebCrawler
 				System.out.printf("%d. %s\n%s\n\n", i, html, text );
 			}
 //			*/
+			Timer.delayForRequest();
 //			findActionBlock( getVisualBlock( u ) );
-			BlockProperties contentProp = parseWebContent( u ); 
-			System.out.println( "\n正文: " ); contentProp.print();
+			for ( String s : u )
+			{
+				BlockProperties contentProp = parseWebContent( s ); 
+				System.out.println( "\n正文: " ); contentProp.print();
+				System.out.println( contentProp.getBlockHtml().length() );
+				System.out.println( contentProp.getBlockText().length() );
+			}
 			
 			/*
 //			Output.printCollection( parseAddressList( u ), true );
@@ -652,7 +658,7 @@ public class WebContentParser extends WebCrawler
 			String blockHtml = block.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
 			blockProp.setBlockHtml( blockHtml );
 			String blockText = WebCrawler.filterSpecialSymbol( block.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
-			blockProp.setBlockText( blockText );
+//			blockProp.setBlockText( blockText );
 //			System.out.printf("*%s\n%s\n#", mainHtml, mainText );
 //			System.out.println( mainText.length() );
 			
