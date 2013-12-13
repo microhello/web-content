@@ -271,8 +271,13 @@ public class WebContentParser extends WebCrawler
 		
 		// 找到正文區塊還有其子區块，判斷是否包含連結區塊或是特定class, id名稱，然後過濾掉。
 		Node currentNode = contentProp.getBlockNode();
-		String contentHtml = currentNode.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
-		String contentText = WebCrawler.filterSpecialSymbol( currentNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() );
+		String contentHtml =
+				org.apache.commons.lang3.StringUtils.replacePattern( currentNode.toHtml(), "\\s+", " " ).toLowerCase().trim();
+
+//				currentNode.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
+		String contentText = WebCrawler.filterSpecialSymbol(
+				org.apache.commons.lang3.StringUtils.replacePattern( currentNode.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() );
+//				currentNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() );
 //		System.out.println( contentText.length() );
 		String checkContentHtml = contentHtml; // check開頭的變數是給迴圈判斷正文區塊的子區塊用的
 		String checkContentText = contentText; // 因為在迴圈中contentHtml和contentText的字串會變動，所以無法拿來判斷子區塊
@@ -281,8 +286,12 @@ public class WebContentParser extends WebCrawler
 					i < visualBlockNodeList.size(); i++ )
 		{
 			CompositeTag nextNode = (CompositeTag)visualBlockNodeList.elementAt( i );
-			String nextHtml = nextNode.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
-			String nextText = WebCrawler.filterSpecialSymbol( nextNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
+			String nextHtml =
+					org.apache.commons.lang3.StringUtils.replacePattern( nextNode.toHtml(), "\\s+", " " ).toLowerCase().trim();
+//					nextNode.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
+			String nextText = WebCrawler.filterSpecialSymbol(
+					org.apache.commons.lang3.StringUtils.replacePattern( nextNode.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() );
+//					nextNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
 			
 			if ( checkContentHtml.contains( nextHtml ) &&
 					checkContentText.contains( nextText ) )
@@ -346,7 +355,11 @@ public class WebContentParser extends WebCrawler
 //			System.out.println( "Filter=" + html );
 			contentHtml = contentHtml.replace( html, "" );
 		}
-		contentProp.setBlockHtml( contentHtml.replaceAll( HtmlTag.BR_REPLACE_REGEX, " " ).replaceAll( HtmlTag.STYLE_REPLACE_REGEX, "" ) );
+		contentProp.setBlockHtml(
+				org.apache.commons.lang3.StringUtils.replacePattern( 
+				org.apache.commons.lang3.StringUtils.replacePattern( contentHtml, HtmlTag.BR_REPLACE_REGEX, " " ), HtmlTag.STYLE_REPLACE_REGEX, "" ) );
+		
+//				contentHtml.replaceAll( HtmlTag.BR_REPLACE_REGEX, " " ).replaceAll( HtmlTag.STYLE_REPLACE_REGEX, "" ) );
 //		contentProp.setBlockText( WebCrawler.filterSpecialSymbol( WebCrawler.filterHTMLTag( contentProp.getBlockHtml(), "" ) ) );
 
 //		contentProp.setBlockText( contentText );
@@ -608,14 +621,22 @@ public class WebContentParser extends WebCrawler
 			throw new NullPointerException("沒有找到任何<div>或<p>或<table>的標籤區塊!!");
 		
 		Node currentNode = elementBlockNodeList.elementAt( 0 );
-		String currentHtml = currentNode.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
-		String currentText = WebCrawler.filterSpecialSymbol( currentNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
+		String currentHtml = 
+				org.apache.commons.lang3.StringUtils.replacePattern( currentNode.toHtml(), "\\s+", " " ).toLowerCase().trim();
+//				currentNode.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
+		String currentText = WebCrawler.filterSpecialSymbol(
+				org.apache.commons.lang3.StringUtils.replacePattern( currentNode.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() );
+//				currentNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
 		for ( int i = 1; i < elementBlockNodeList.size(); i++ )
 		{
 			Node nextNode = elementBlockNodeList.elementAt( i );
 			
-			String nextHtml = nextNode.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
-			String nextText = WebCrawler.filterSpecialSymbol( nextNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
+			String nextHtml =
+					org.apache.commons.lang3.StringUtils.replacePattern( nextNode.toHtml(), "\\s+", " " ).toLowerCase().trim();
+//					nextNode.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
+			String nextText = WebCrawler.filterSpecialSymbol(
+					org.apache.commons.lang3.StringUtils.replacePattern( nextNode.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() );
+//					nextNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
 
 			if ( nextText.length() <= 0  )
 				continue;
@@ -658,9 +679,13 @@ public class WebContentParser extends WebCrawler
 		{
 			Node block = visualBlockList.elementAt( i );
 			BlockProperties blockProp = new BlockProperties( block );
-			String blockHtml = block.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
+			String blockHtml =
+					org.apache.commons.lang3.StringUtils.replacePattern( block.toHtml(), "\\s+", " " ).toLowerCase().trim();
+//					block.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
 			blockProp.setBlockHtml( blockHtml );
-			String blockText = WebCrawler.filterSpecialSymbol( block.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
+			String blockText = WebCrawler.filterSpecialSymbol(
+					org.apache.commons.lang3.StringUtils.replacePattern( block.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() ).trim();
+//					block.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
 //			blockProp.setBlockText( blockText );
 //			System.out.printf("*%s\n%s\n#", mainHtml, mainText );
 //			System.out.println( mainText.length() );
@@ -706,8 +731,12 @@ public class WebContentParser extends WebCrawler
 			for ( int j = i + 1; j < visualBlockList.size() ; j++ )
 			{
 				Node blockToCheck = visualBlockList.elementAt( j );
-				String checkHtml = blockToCheck.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
-				String checkText = WebCrawler.filterSpecialSymbol( blockToCheck.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
+				String checkHtml =
+						org.apache.commons.lang3.StringUtils.replacePattern( blockToCheck.toHtml(), "\\s+", " " ).toLowerCase().trim();
+//						blockToCheck.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
+				String checkText = WebCrawler.filterSpecialSymbol(
+						org.apache.commons.lang3.StringUtils.replacePattern( blockToCheck.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() ).trim();
+//						blockToCheck.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
 				if ( blockHtml.contains( checkHtml ) &&
 						blockText.contains( checkText ) )
 				{
@@ -764,7 +793,9 @@ public class WebContentParser extends WebCrawler
 		{
 			int linkTextLength = 0;
 			Node node = blockNodeList.elementAt( i );
-			String nodeText = WebCrawler.filterSpecialSymbol( node.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
+			String nodeText = WebCrawler.filterSpecialSymbol(
+					org.apache.commons.lang3.StringUtils.replacePattern( node.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() );
+//					node.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
 			
 			try
 			{
@@ -776,7 +807,9 @@ public class WebContentParser extends WebCrawler
 				{
 					Node childNode = childrenNodeList.elementAt( j );
 					String childNodeName = childNode.getClass().getSimpleName();
-					String childText = WebCrawler.filterSpecialSymbol( childNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
+					String childText = WebCrawler.filterSpecialSymbol(
+							org.apache.commons.lang3.StringUtils.replacePattern( childNode.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() );
+//							childNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
 					if ( childNodeName.equals( TextNode.class.getSimpleName() ) && childText.length() <= 0 )
 						continue;
 					
@@ -884,7 +917,9 @@ public class WebContentParser extends WebCrawler
 		{
 			Node childNode = childrenNodeList.elementAt( j );
 			String childNodeName = childNode.getClass().getSimpleName();
-			String childText = WebCrawler.filterSpecialSymbol( childNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
+			String childText = WebCrawler.filterSpecialSymbol(
+					org.apache.commons.lang3.StringUtils.replacePattern( childNode.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() ).trim();
+//					childNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
 			if ( childNodeName.equals( TextNode.class.getSimpleName() ) && childText.length() <= 0 )
 				continue;
 			
@@ -923,7 +958,9 @@ public class WebContentParser extends WebCrawler
 				{
 					Node childNode = childrenNodeList.elementAt( j );
 					String childNodeName = childNode.getClass().getSimpleName();
-					String childText = WebCrawler.filterSpecialSymbol( childNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
+					String childText = WebCrawler.filterSpecialSymbol(
+							org.apache.commons.lang3.StringUtils.replacePattern( childNode.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() ).trim();
+//							childNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
 					if ( childNodeName.equals( TextNode.class.getSimpleName() ) && childText.length() <= 0 )
 						continue;
 					
@@ -1034,7 +1071,9 @@ public class WebContentParser extends WebCrawler
 		{
 			Node childNode = childrenNodeList.elementAt( j );
 			String childNodeName = childNode.getClass().getSimpleName();
-			String childText = WebCrawler.filterSpecialSymbol( childNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
+			String childText = WebCrawler.filterSpecialSymbol(
+					org.apache.commons.lang3.StringUtils.replacePattern( childNode.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() ).trim();
+//					childNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
 			if ( childNodeName.equals( TextNode.class.getSimpleName() ) && childText.length() <= 0 )
 				continue;
 			
@@ -1088,7 +1127,9 @@ public class WebContentParser extends WebCrawler
 				{
 					Node childNode = childrenNodeList.elementAt( j );
 					String childNodeName = childNode.getClass().getSimpleName();
-					String childText = WebCrawler.filterSpecialSymbol( childNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
+					String childText = WebCrawler.filterSpecialSymbol(
+							org.apache.commons.lang3.StringUtils.replacePattern( childNode.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() ).trim();
+//							childNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
 					if ( childNodeName.equals( TextNode.class.getSimpleName() ) && childText.length() <= 0 )
 						continue;
 					
@@ -1286,7 +1327,9 @@ public class WebContentParser extends WebCrawler
 			Node node = divParagraphNodeList.elementAt( i );
 			String nodeName = node.getClass().getSimpleName();
 			String nodeHtml = node.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
-			String nodeText = WebCrawler.filterSpecialSymbol( node.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
+			String nodeText = WebCrawler.filterSpecialSymbol(
+					org.apache.commons.lang3.StringUtils.replacePattern( node.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() ).trim();
+//					node.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
 			System.out.printf( "Tag=%s\nHtml=%s\nText=%s\n", nodeName, nodeHtml, nodeText );
 
 				printChildrenNode( node, 1 );
