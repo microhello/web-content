@@ -72,9 +72,9 @@ public class WebContentParser extends WebCrawler
 	
 	private static final String URL_PATH = "dat/web_content/article_url";
 	
-	public static BlockProperties parseWebContent( String url ) throws ParserException
+	public static BlockProperties parseWebContent( Parser parser ) throws ParserException
 	{
-		NodeList visualBlockNodeList = getVisualBlock( url );
+		NodeList visualBlockNodeList = getVisualBlock( parser );
 //		Output.printNodeList( visualBlockNodeList );
 		NodeList linkNodeList = findLinkBlock( visualBlockNodeList );
 		NodeList invalidNodeList = findInvalidBlock( visualBlockNodeList );
@@ -370,6 +370,12 @@ public class WebContentParser extends WebCrawler
 		return contentProp;
 	}
 	
+	public static BlockProperties parseWebContent( String url ) throws ParserException
+	{
+		Parser parser = new Parser( url );
+		return parseWebContent( parser );
+	}
+	
 	public static int parseContentImgCount( String contentHtml ) throws ParserException
 	{
 		return Parser.createParser( contentHtml, "UTF-8" )
@@ -481,13 +487,14 @@ public class WebContentParser extends WebCrawler
 				System.out.printf("%d. %s\n%s\n\n", i, html, text );
 			}
 //			*/
-			Timer.delayForRequest();
+//			Timer.delayForRequest();
 			long startTime = System.currentTimeMillis();
 
 //			findActionBlock( getVisualBlock( u ) );
 			for ( String s : u )
 			{
-				BlockProperties contentProp = parseWebContent( s ); 
+				Parser p = new Parser( s );
+				BlockProperties contentProp = parseWebContent( p );
 				System.out.println( "\n正文: " ); contentProp.print();
 				System.out.println( contentProp.getBlockHtml().length() );
 				System.out.println( contentProp.getBlockText().length() );
@@ -600,6 +607,65 @@ public class WebContentParser extends WebCrawler
 			output.close();
 	}
 	
+	public static NodeList getVisualBlock( Parser parser ) throws ParserException
+	{
+		NodeList elementBlockNodeList = Parser.createParser( trimScript( parser ), getEncode( parser ) ).extractAllNodesThatMatch( new OrFilter( BLOCK_FILTER ) );
+//				Parser.createParser( WebCrawler.getNodeList( url, new NodeClassFilter( Html.class ) ).toHtml(), getEncode( url ) ).extractAllNodesThatMatch( new NodeClassFilter( Div.class ) );
+
+//				Parser.createParser( WebCrawler.getNodeList( url ).toHtml(), getEncode( url ) ).extractAllNodesThatMatch( new AndFilter( new NodeClassFilter( Div.class ), new HasAttributeFilter( "class", "articleBody" ) ) );
+		NodeList visualBlockNodeList = new NodeList();
+		
+		if ( elementBlockNodeList.size() <= 0 )
+			throw new NullPointerException("沒有找到任何<div>或<p>或<table>的標籤區塊!!");
+		
+		Node currentNode = elementBlockNodeList.elementAt( 0 );
+		String currentHtml = 
+				org.apache.commons.lang3.StringUtils.replacePattern( currentNode.toHtml(), "\\s+", " " ).toLowerCase().trim();
+//					currentNode.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
+		String currentText = WebCrawler.filterSpecialSymbol(
+				org.apache.commons.lang3.StringUtils.replacePattern( currentNode.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() );
+//					currentNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
+		for ( int i = 1; i < elementBlockNodeList.size(); i++ )
+		{
+			Node nextNode = elementBlockNodeList.elementAt( i );
+			
+			String nextHtml =
+					org.apache.commons.lang3.StringUtils.replacePattern( nextNode.toHtml(), "\\s+", " " ).toLowerCase().trim();
+//						nextNode.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
+			String nextText = WebCrawler.filterSpecialSymbol(
+					org.apache.commons.lang3.StringUtils.replacePattern( nextNode.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() );
+//						nextNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
+
+			if ( nextText.length() <= 0  )
+				continue;
+			
+//				System.out.printf( "%d.Tag=%s\nHtml=%s\nText=%s\n", i, nextNode.getClass().getSimpleName(), nextHtml, nextText );
+			if ( nextText.equals( currentText ) && nextHtml.length() < currentHtml.length() )
+			{
+//					System.out.printf( "%d.*Tag=%s\nHtml=%s\nText=%s\n\n", i, nextNode.getClass().getSimpleName(), nextHtml, nextText );
+//					System.out.println("\tDuplicate");
+//					visualBlockNodeList.add( nextNode );
+				currentNode = nextNode;
+				currentHtml = nextHtml;
+				currentText = nextText;
+			}
+			else if ( !nextText.equals( currentText ) )
+			{
+//					System.out.printf( "%d.**Tag=%s\nHtml=%s\nText=%s\n\n", i, currentNode.getClass().getSimpleName(), currentHtml, currentText );
+//					System.out.println("\tUnique");
+				
+				currentNode = nextNode;
+				currentHtml = nextHtml;
+				currentText = nextText;
+				
+				if ( !visualBlockNodeList.contains( currentNode ) )
+					visualBlockNodeList.add( currentNode );
+//					visualBlockNodeList.add( currentNode );
+			}
+		}
+		return visualBlockNodeList;
+	}
+	
 	/**
 	 * 先找到文字彼此獨立的視覺區塊。
 	 * 
@@ -610,62 +676,7 @@ public class WebContentParser extends WebCrawler
 	public static NodeList getVisualBlock( String url ) throws ParserException
 	{
 		Parser parser = new Parser( url.trim() );
-		NodeList elementBlockNodeList = 
-			Parser.createParser( trimScript( parser ), getEncode( parser ) ).extractAllNodesThatMatch( new OrFilter( BLOCK_FILTER ) );
-//			Parser.createParser( WebCrawler.getNodeList( url, new NodeClassFilter( Html.class ) ).toHtml(), getEncode( url ) ).extractAllNodesThatMatch( new NodeClassFilter( Div.class ) );
-
-//			Parser.createParser( WebCrawler.getNodeList( url ).toHtml(), getEncode( url ) ).extractAllNodesThatMatch( new AndFilter( new NodeClassFilter( Div.class ), new HasAttributeFilter( "class", "articleBody" ) ) );
-		NodeList visualBlockNodeList = new NodeList();
-		
-		if ( elementBlockNodeList.size() <= 0 )
-			throw new NullPointerException("沒有找到任何<div>或<p>或<table>的標籤區塊!!");
-		
-		Node currentNode = elementBlockNodeList.elementAt( 0 );
-		String currentHtml = 
-				org.apache.commons.lang3.StringUtils.replacePattern( currentNode.toHtml(), "\\s+", " " ).toLowerCase().trim();
-//				currentNode.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
-		String currentText = WebCrawler.filterSpecialSymbol(
-				org.apache.commons.lang3.StringUtils.replacePattern( currentNode.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() );
-//				currentNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
-		for ( int i = 1; i < elementBlockNodeList.size(); i++ )
-		{
-			Node nextNode = elementBlockNodeList.elementAt( i );
-			
-			String nextHtml =
-					org.apache.commons.lang3.StringUtils.replacePattern( nextNode.toHtml(), "\\s+", " " ).toLowerCase().trim();
-//					nextNode.toHtml().replaceAll( "\\s+", " " ).toLowerCase().trim();
-			String nextText = WebCrawler.filterSpecialSymbol(
-					org.apache.commons.lang3.StringUtils.replacePattern( nextNode.toPlainTextString(), "\\s+", " " ).toLowerCase().trim() );
-//					nextNode.toPlainTextString().replaceAll( "\\s+", " " ).trim() ).trim();
-
-			if ( nextText.length() <= 0  )
-				continue;
-			
-//			System.out.printf( "%d.Tag=%s\nHtml=%s\nText=%s\n", i, nextNode.getClass().getSimpleName(), nextHtml, nextText );
-			if ( nextText.equals( currentText ) && nextHtml.length() < currentHtml.length() )
-			{
-//				System.out.printf( "%d.*Tag=%s\nHtml=%s\nText=%s\n\n", i, nextNode.getClass().getSimpleName(), nextHtml, nextText );
-//				System.out.println("\tDuplicate");
-//				visualBlockNodeList.add( nextNode );
-				currentNode = nextNode;
-				currentHtml = nextHtml;
-				currentText = nextText;
-			}
-			else if ( !nextText.equals( currentText ) )
-			{
-//				System.out.printf( "%d.**Tag=%s\nHtml=%s\nText=%s\n\n", i, currentNode.getClass().getSimpleName(), currentHtml, currentText );
-//				System.out.println("\tUnique");
-				
-				currentNode = nextNode;
-				currentHtml = nextHtml;
-				currentText = nextText;
-				
-				if ( !visualBlockNodeList.contains( currentNode ) )
-					visualBlockNodeList.add( currentNode );
-//				visualBlockNodeList.add( currentNode );
-			}
-		}
-		return visualBlockNodeList;
+		return getVisualBlock( parser );
 	}
 	
 	public static List<BlockProperties> getBlockProperties( Map<String, NodeList> blockNodeMap )
