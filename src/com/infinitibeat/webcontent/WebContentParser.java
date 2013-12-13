@@ -469,6 +469,8 @@ public class WebContentParser extends WebCrawler
 			}
 //			*/
 			Timer.delayForRequest();
+			long startTime = System.currentTimeMillis();
+
 //			findActionBlock( getVisualBlock( u ) );
 			for ( String s : u )
 			{
@@ -477,7 +479,7 @@ public class WebContentParser extends WebCrawler
 				System.out.println( contentProp.getBlockHtml().length() );
 				System.out.println( contentProp.getBlockText().length() );
 			}
-			
+			System.out.println( (double)( System.currentTimeMillis() - startTime ) / 1000.0 + " secs.");
 			/*
 //			Output.printCollection( parseAddressList( u ), true );
 //			parseAddressList( u, "台北市" );
@@ -594,8 +596,9 @@ public class WebContentParser extends WebCrawler
 	 */
 	public static NodeList getVisualBlock( String url ) throws ParserException
 	{
+		Parser parser = new Parser( url.trim() );
 		NodeList elementBlockNodeList = 
-			Parser.createParser( trimScript( url.trim() ), getEncode( url ) ).extractAllNodesThatMatch( new OrFilter( BLOCK_FILTER ) );
+			Parser.createParser( trimScript( parser ), getEncode( parser ) ).extractAllNodesThatMatch( new OrFilter( BLOCK_FILTER ) );
 //			Parser.createParser( WebCrawler.getNodeList( url, new NodeClassFilter( Html.class ) ).toHtml(), getEncode( url ) ).extractAllNodesThatMatch( new NodeClassFilter( Div.class ) );
 
 //			Parser.createParser( WebCrawler.getNodeList( url ).toHtml(), getEncode( url ) ).extractAllNodesThatMatch( new AndFilter( new NodeClassFilter( Div.class ), new HasAttributeFilter( "class", "articleBody" ) ) );
@@ -692,8 +695,6 @@ public class WebContentParser extends WebCrawler
 				int linkTextLen = getLinkTextLength( block );
 //				System.out.printf(", #%d, R=%f\n", linkTextLen, (double)linkTextLen / (double)mainText.length() );
 				blockProp.setBlockTextRatio( (double)linkTextLen / (double)blockText.length() );
-				
-				
 			}
 			
 			int subBlockNum = 0;
