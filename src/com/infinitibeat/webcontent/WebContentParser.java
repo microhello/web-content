@@ -72,8 +72,9 @@ public class WebContentParser extends WebCrawler
 	
 	private static final String URL_PATH = "dat/web_content/article_url";
 	
-	public static BlockProperties parseWebContent( Parser parser ) throws ParserException
+	public static BlockProperties parseWebContent( String url ) throws ParserException
 	{
+		Parser parser = new Parser( url );
 		NodeList visualBlockNodeList = getVisualBlock( parser );
 //		Output.printNodeList( visualBlockNodeList );
 		NodeList linkNodeList = findLinkBlock( visualBlockNodeList );
@@ -370,12 +371,6 @@ public class WebContentParser extends WebCrawler
 		return contentProp;
 	}
 	
-	public static BlockProperties parseWebContent( String url ) throws ParserException
-	{
-		Parser parser = new Parser( url );
-		return parseWebContent( parser );
-	}
-	
 	public static int parseContentImgCount( String contentHtml ) throws ParserException
 	{
 		return Parser.createParser( contentHtml, "UTF-8" )
@@ -493,8 +488,7 @@ public class WebContentParser extends WebCrawler
 //			findActionBlock( getVisualBlock( u ) );
 			for ( String s : u )
 			{
-				Parser p = new Parser( s );
-				BlockProperties contentProp = parseWebContent( p );
+				BlockProperties contentProp = parseWebContent( s );
 				System.out.println( "\n正文: " ); contentProp.print();
 				System.out.println( contentProp.getBlockHtml().length() );
 				System.out.println( contentProp.getBlockText().length() );
