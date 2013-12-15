@@ -78,9 +78,8 @@ public class WebContentParser extends WebCrawler
 		System.setProperty ("sun.net.client.defaultConnectTimeout", String.valueOf( CRAWLER_TIMEOUT ) );
 	}
 	
-	public static BlockProperties parseWebContent( String url ) throws ParserException
+	public static BlockProperties parseWebContent( Parser parser ) throws ParserException
 	{
-		Parser parser = new Parser( url );
 		NodeList visualBlockNodeList = getVisualBlock( parser );
 //		Output.printNodeList( visualBlockNodeList );
 		NodeList linkNodeList = findLinkBlock( visualBlockNodeList );
@@ -375,6 +374,12 @@ public class WebContentParser extends WebCrawler
 //		contentProp.setBlockHtml( contentHtml.replaceAll( HtmlTag.BR_REPLACE_REGEX, " " ).replaceAll( HtmlTag.STYLE_REPLACE_REGEX, "" ) );
 //		contentProp.setBlockText( WebCrawler.filterSpecialSymbol( WebCrawler.filterHTMLElement( contentProp.getBlockHtml() ) ) );
 		return contentProp;
+	}  
+	
+	public static BlockProperties parseWebContent( String url ) throws ParserException
+	{
+		Parser parser = new Parser( url );
+		return parseWebContent( parser );
 	}
 	
 	public static int parseContentImgCount( String contentHtml ) throws ParserException
