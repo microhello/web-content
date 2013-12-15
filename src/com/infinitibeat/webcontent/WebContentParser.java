@@ -72,6 +72,12 @@ public class WebContentParser extends WebCrawler
 	
 	private static final String URL_PATH = "dat/web_content/article_url";
 	
+	static
+	{
+		System.setProperty ("sun.net.client.defaultReadTimeout", String.valueOf( CRAWLER_TIMEOUT ) );
+		System.setProperty ("sun.net.client.defaultConnectTimeout", String.valueOf( CRAWLER_TIMEOUT ) );
+	}
+	
 	public static BlockProperties parseWebContent( String url ) throws ParserException
 	{
 		Parser parser = new Parser( url );
