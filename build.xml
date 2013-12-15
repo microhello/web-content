@@ -29,7 +29,9 @@
 	</target>
 
 	<property name="styletrip_engine_lib.dir" value="../styletrip_engine/lib"/>
+	<property name="sync.dir" location="/var/www/styletrip_exec_sync"/>
 	<target name="update_lib" depends="make">
 		<copy file="${jar.name}" todir="${styletrip_engine_lib.dir}" overwrite="true"/>
+		<copy file="${jar.name}" todir="${sync.dir}/lib" overwrite="true"/>
 	</target>
 </project>
